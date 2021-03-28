@@ -13,6 +13,7 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Bidirectional, LSTM, Dense
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 import prep
 
 np.random.seed(42)
@@ -489,3 +490,67 @@ def Multilayer_LSTM(x_tr, y_tr, epoch, batch, opt, los, x_val, y_val):
     history = model.fit(x_tr, y_tr, epochs=epoch, batch_size=batch, validation_data=(x_val, y_val))
 
     return model, history
+
+
+def eval_on_features(index, date, features, target, regressor):
+    x_train, x_test = features[:index], features[index:]
+    y_train, y_test = target[:index], target[index:]
+
+    regressor.fit(x_train, y_train)
+
+    y_pred = regressor.predict(x_test)
+    y_pred_train = regressor.predict(x_train)
+
+    print("Train MAE: {:.2f}".format(mean_absolute_error(y_train, y_pred_train)))
+    print("Test MAE: {:.2f}".format(mean_absolute_error(y_test, y_pred)))
+    # print("Train RMSE: {:.2f}".format(mean_squared_error(y_train, y_pred_train)))
+    # print("Test RMSE: {:.2f}".format(mean_squared_error(y_test, y_pred))) # squared=True is default
+
+    plt.figure(figsize=(15, 5))
+    plt.xticks(date, rotation=90, ha='left')
+
+    plt.plot(range(index), y_train, label="train")
+    plt.plot(range(index, len(y_test) + index), y_test, '-', label="test")
+    plt.plot(range(index), y_pred_train, '--', label="pred train")
+    plt.plot(range(index, len(y_test) + index), y_pred, '--', label="pred test")
+    plt.legend(loc=(1.01, 0))
+
+def eval_on_features_returnmodel(index, date, features, target, regressor):
+    x_train, x_test = features[:index], features[index:]
+    y_train, y_test = target[:index], target[index:]
+
+    regressor.fit(x_train, y_train)
+
+    y_pred = regressor.predict(x_test)
+    y_pred_train = regressor.predict(x_train)
+
+    print("Train MAE: {:.2f}".format(mean_absolute_error(y_train, y_pred_train)))
+    print("Test MAE: {:.2f}".format(mean_absolute_error(y_test, y_pred)))
+    # print("Train RMSE: {:.2f}".format(mean_squared_error(y_train, y_pred_train)))
+    # print("Test RMSE: {:.2f}".format(mean_squared_error(y_test, y_pred))) # squared=True is default
+
+    plt.figure(figsize=(15, 5))
+    plt.xticks(date, rotation=90, ha='left')
+
+    plt.plot(range(index), y_train, label="train")
+    plt.plot(range(index, len(y_test) + index), y_test, '-', label="test")
+    plt.plot(range(index), y_pred_train, '--', label="pred train")
+    plt.plot(range(index, len(y_test) + index), y_pred, '--', label="pred test")
+    plt.legend(loc=(1.01, 0))
+
+    return regressor
+
+
+def check_coefficient(rlr, feature_name, threshold):
+    ridge_coef = np.array(rlr.coef_).reshape(rlr.coef_.shape[-1])
+    ridge_coef_df = pd.DataFrame(list(zip(feature_name, ridge_coef)),
+                                 columns=['X_name', 'ridge_coef'])
+
+    high_ridge_coef = ridge_coef_df[ridge_coef_df['ridge_coef'] > threshold]
+    high_ridge_coef = high_ridge_coef.sort_values(by=['ridge_coef'], ascending=False)
+    print(high_ridge_coef.head())
+
+    plt.figure(figsize=(15, 2))
+    plt.bar(range(high_ridge_coef.shape[0]), high_ridge_coef['ridge_coef'], color="r", align="center")
+    plt.xticks(range(high_ridge_coef.shape[0]), high_ridge_coef['X_name'], rotation=90)
+    plt.show()
