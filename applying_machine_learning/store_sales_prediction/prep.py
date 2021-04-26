@@ -6,21 +6,23 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import OneHotEncoder, PolynomialFeatures
 
 
-def minmax_scale_y(feature):
+def minmax_scale_y(feature_tr, feature_ts):
     scaler_y = MinMaxScaler(feature_range=(-1, 1))
-    df_y_scaled = scaler_y.fit_transform(feature).reshape(-1,1)
-    df_y_scaled = pd.DataFrame(df_y_scaled, columns=['Sales'])
-    return df_y_scaled, scaler_y
+    tr_y_scaled = scaler_y.fit_transform(feature_tr).reshape(-1, 1)
+    ts_y_scaled = scaler_y.transform(feature_ts).reshape(-1, 1)
 
-def minmax_scale_x(feature):
+    tr_y_scaled = pd.DataFrame(tr_y_scaled, columns=feature_tr.columns)
+    ts_y_scaled = pd.DataFrame(ts_y_scaled, columns=feature_ts.columns)
+    return tr_y_scaled, ts_y_scaled, scaler_y
+
+def minmax_scale_x(feature_tr, feature_ts):
     scaler_x = MinMaxScaler(feature_range=(-1, 1))
-    df_x_scaled = scaler_x.fit_transform(np.array(feature))
-    df_x_scaled = pd.DataFrame(df_x_scaled, columns=['Customers', 'Open', 'Promo', 'SchoolHoliday',
-       'DayOfWeek_1', 'DayOfWeek_2', 'DayOfWeek_3', 'DayOfWeek_4',
-       'DayOfWeek_5', 'DayOfWeek_6', 'DayOfWeek_7', 'StateHoliday_0',
-       'StateHoliday_a', 'StateHoliday_b', 'StateHoliday_c'])
-    return df_x_scaled
+    tr_x_scaled = scaler_x.fit_transform(np.array(feature_tr))
+    ts_x_scaled = scaler_x.transform(np.array(feature_ts))
 
+    tr_x_scaled = pd.DataFrame(tr_x_scaled, columns=feature_tr.columns)
+    ts_x_scaled = pd.DataFrame(ts_x_scaled, columns=feature_ts.columns)
+    return tr_x_scaled, ts_x_scaled
 
 def create_dataset(data, look_back, look_after, y_feature, x_feature):
     x_arr, y_arr = [], []
@@ -35,7 +37,6 @@ def create_dataset(data, look_back, look_after, y_feature, x_feature):
     print('Y shape : ' + str(y_arr.shape))
 
     return x_arr, y_arr
-
 
 class Preprocess_DARNN():
     def __init__(self, train_data, test_data, interval):

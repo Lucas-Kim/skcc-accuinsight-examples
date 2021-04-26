@@ -1,5 +1,3 @@
-#This attribute contains internal utility functions.
-#It is not exposed to package users.
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -72,6 +70,31 @@ def GetResult_inverseTransfrom(x_target, y_target, scaler, model_created, target
     # print(mean_absolute_error(target_inversed.sum(axis=1), pred_inversed.sum(axis=1)))
 
 
+def GetResult_inverseTransfrom_darnn(pred, y_target, scaler):
+    labels_inverse = scaler.inverse_transform(y_target.reshape(-1, 1)).flatten()
+    preds_inverse = scaler.inverse_transform(pred.reshape(-1, 1)).flatten()
+    preds_inverse = [0 if i < 0 else i for i in preds_inverse]
+
+    mae_darnn = mean_absolute_error(labels_inverse, preds_inverse)
+    print(mae_darnn)
+
+    y_min = min(min(labels_inverse), min(preds_inverse)) - 100
+    y_max = max(max(labels_inverse), max(preds_inverse)) + 100
+
+    plt.rcParams["figure.figsize"] = (16, 5)
+
+    plt.plot(labels_inverse, 'b.-', label='original')
+    plt.axis([1, len(labels_inverse), y_min, y_max])
+    plt.legend(fontsize=14)
+    plt.grid(True)
+
+    plt.plot(preds_inverse, 'r.-', label='predict')
+    plt.axis([1, len(preds_inverse), y_min, y_max])
+    plt.legend(fontsize=14)
+
+    plt.show()
+
+
 my_prediction = {}
 
 colors = ['r', 'c', 'm', 'y', 'k', 'khaki', 'teal', 'orchid', 'sandybrown',
@@ -110,27 +133,3 @@ def Graph_Evaluation(mae, name='no_name'):
 
     plt.show()
 
-
-def GetResult_inverseTransfrom_darnn(pred, y_target, scaler):
-    labels_inverse = scaler.inverse_transform(y_target.reshape(-1, 1)).flatten()
-    preds_inverse = scaler.inverse_transform(pred.reshape(-1, 1)).flatten()
-    preds_inverse = [0 if i < 0 else i for i in preds_inverse]
-
-    mae_darnn = mean_absolute_error(labels_inverse, preds_inverse)
-    print(mae_darnn)
-
-    y_min = min(min(labels_inverse), min(preds_inverse)) - 100
-    y_max = max(max(labels_inverse), max(preds_inverse)) + 100
-
-    plt.rcParams["figure.figsize"] = (16, 5)
-
-    plt.plot(labels_inverse, 'b.-', label='original')
-    plt.axis([1, len(labels_inverse), y_min, y_max])
-    plt.legend(fontsize=14)
-    plt.grid(True)
-
-    plt.plot(preds_inverse, 'r.-', label='predict')
-    plt.axis([1, len(preds_inverse), y_min, y_max])
-    plt.legend(fontsize=14)
-
-    plt.show()
