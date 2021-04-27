@@ -20,6 +20,19 @@ tf.random.set_seed(42)
 
 
 def FCNN(x_tr, y_tr, epoch, batch, opt, los, x_val, y_val):
+    '''
+    Create Fully-connected Neural Network
+
+    :param x_tr: X of train data
+    :param y_tr: Y of train data
+    :param epoch: # of epochs
+    :param batch: Batch size
+    :param opt: optimizer
+    :param los: losss function
+    :param x_val: X of validation data
+    :param y_val: Y of validation
+    :return: model, history
+    '''
     model = tf.keras.models.Sequential([
         # Shape: (time, features) => (time*features)
         keras.layers.Flatten(input_shape=[x_tr.shape[1], x_tr.shape[2]]),
@@ -36,6 +49,19 @@ def FCNN(x_tr, y_tr, epoch, batch, opt, los, x_val, y_val):
 
 
 def LSTM_1_layer(x_tr, y_tr, epoch, batch, opt, los, x_val, y_val):
+    '''
+    Create 1-layer LSTM
+
+    :param x_tr: X of train data
+    :param y_tr: Y of train data
+    :param epoch: # of epochs
+    :param batch: Batch size
+    :param opt: optimizer
+    :param los: losss function
+    :param x_val: X of validation data
+    :param y_val: Y of validation
+    :return: model, history
+    '''
     model = keras.models.Sequential([
         keras.layers.RNN(keras.layers.LSTMCell(64), input_shape=[None, x_tr.shape[2]]),
         keras.layers.Dense(32, activation='tanh'),
@@ -50,6 +76,20 @@ def LSTM_1_layer(x_tr, y_tr, epoch, batch, opt, los, x_val, y_val):
 
 
 def Multilayer_LSTM(x_tr, y_tr, epoch, batch, opt, los, x_val, y_val):
+    '''
+    Create Multi-layer LSTM
+
+    :param x_tr: X of train data
+    :param y_tr: Y of train data
+    :param epoch: # of epochs
+    :param batch: Batch size
+    :param opt: optimizer
+    :param los: losss function
+    :param x_val: X of validation data
+    :param y_val: Y of validation
+    :return: model, history
+    '''
+
     model = keras.models.Sequential([
         keras.layers.RNN(keras.layers.LSTMCell(64), return_sequences=True, input_shape=[None, x_tr.shape[2]]),
         keras.layers.RNN(keras.layers.LSTMCell(32), return_sequences=True),
@@ -68,6 +108,19 @@ def Multilayer_LSTM(x_tr, y_tr, epoch, batch, opt, los, x_val, y_val):
 
 
 def BidirectionalLSTM(x_tr, y_tr, epoch, batch, opt, los, x_val, y_val):
+    '''
+    Create Bi-directional LSTM
+
+    :param x_tr: X of train data
+    :param y_tr: Y of train data
+    :param epoch: # of epochs
+    :param batch: Batch size
+    :param opt: optimizer
+    :param los: losss function
+    :param x_val: X of validation data
+    :param y_val: Y of validation
+    :return: model, history
+    '''
     model = Sequential()
     model.add(Bidirectional(LSTM(32, ), input_shape=(None, x_tr.shape[2])))
     model.add(Dense(16, activation='tanh'))
@@ -82,6 +135,12 @@ def BidirectionalLSTM(x_tr, y_tr, epoch, batch, opt, los, x_val, y_val):
 
 class AutoRegressionLSTM(tf.keras.Model):
     def __init__(self, units, out_steps):
+        '''
+        Create Auto-regression LSTM
+
+        :param units: # of LSTM units
+        :param out_steps: periods of target data
+        '''
         super().__init__()
         self.out_steps = out_steps
         self.units = units
@@ -143,11 +202,19 @@ class AutoRegressionLSTM(tf.keras.Model):
 class model_DARNN():
     def __init__(self, train_data, test_data, interval, m, p, n, batch_size, learning_rate, epochs):
         '''
-        :param interval : interval of time series
-        :param m: encoder lstm unit length
-        :param p: decoder lstm unit length
-        :param n: number of features
+        Create DARNN
+
+        :param train_data: train data (y should be located in 0 column)
+        :param test_data: train data (y should be located in 0 column)
+        :param interval: periods of x data
+        :param m: encoder LSTM unit length
+        :param p: decoder LSTM unit length
+        :param n: # of features
+        :param batch_size: batch size
+        :param learning_rate: learning rate
+        :param epochs: # of epochs
         '''
+
         self.pre_darnn = prep.Preprocess_DARNN(train_data, test_data, interval)
         self.pre_darnn.Show_shape(option='train')
         print('---------------------------------------')
@@ -278,7 +345,7 @@ class DARNN(Model):
     def __init__(self, T, m, p, n):
         super(DARNN, self).__init__(name="DARNN")
         """
-        T : 주기 (time series length)
+        T : periods of X data
         m : encoder lstm feature length
         p : decoder lstm feature length
         h0 : lstm initial hidden state

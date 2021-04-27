@@ -6,6 +6,14 @@ import numpy as np
 from sklearn.metrics import mean_absolute_error
 
 def plot_learning_curves(loss, val_loss, epochs):
+    '''
+    Create learning curve for train data, validation data
+
+    :param loss: loss values for train data
+    :param val_loss: loss values for validation data
+    :param epochs: # of epochs
+    :return: None (show graph of learning curve)
+    '''
     plt.rcParams["figure.figsize"] = (6, 4)
     plt.plot(np.arange(len(loss)) + 0.5, loss, "b.-", label="Training loss")
     plt.plot(np.arange(len(val_loss)) + 0.5, loss, "r.-", label="Validation loss")
@@ -18,6 +26,13 @@ def plot_learning_curves(loss, val_loss, epochs):
 
 
 def plot_learning_curves_train(loss, epochs):
+    '''
+    Create learning curve for train data
+
+    :param loss: loss values for train data
+    :param epochs: # of epochs
+    :return: None (show graph of learning curve)
+    '''
     plt.rcParams["figure.figsize"] = (7, 6)
     plt.plot(np.arange(len(loss)) + 0.5, loss, "b.-", label="Training loss")
     # plt.plot(np.arange(len(val_loss)) + 0.5, loss, "r.-", label="Validation loss")
@@ -31,6 +46,18 @@ def plot_learning_curves_train(loss, epochs):
 
 
 def GetResult_inverseTransfrom(x_target, y_target, scaler, model_created, target_size):
+    '''
+    1. Inverse transform true y, pred y
+    2. Calculate Mean Absolute Error
+    3. Show line graphs of true y, pred y
+
+    :param x_target: X of test data
+    :param y_target: Y of test data
+    :param scaler: scaler of y
+    :param model_created: model created
+    :param target_size: period of target value
+    :return: Mean Absolute Error
+    '''
     target_inverse_prepare = y_target.reshape(-1, 1)
     target_inversed = scaler.inverse_transform(target_inverse_prepare).reshape(-1, target_size, 1)
     target_inversed = target_inversed.sum(axis=1)
@@ -71,6 +98,18 @@ def GetResult_inverseTransfrom(x_target, y_target, scaler, model_created, target
 
 
 def GetResult_inverseTransfrom_darnn(pred, y_target, scaler):
+    '''
+    1. Inverse transform true y, pred y
+    2. Calculate Mean Absolute Error
+    3. Show line graphs of true y, pred y
+
+    :param x_target: X of test data
+    :param y_target: Y of test data
+    :param scaler: scaler of y
+    :param model_created: model created
+    :param target_size: period of target value
+    :return: None (show MAE, line graph of true y, pred y)
+    '''
     labels_inverse = scaler.inverse_transform(y_target.reshape(-1, 1)).flatten()
     preds_inverse = scaler.inverse_transform(pred.reshape(-1, 1)).flatten()
     preds_inverse = [0 if i < 0 else i for i in preds_inverse]
@@ -106,6 +145,12 @@ colors = ['r', 'c', 'm', 'y', 'k', 'khaki', 'teal', 'orchid', 'sandybrown',
           ]
 
 def Graph_Evaluation(mae, name='no_name'):
+    '''
+    Visualize performance of the model
+    :param mae: Mean Absolute Error
+    :param name: The name of model
+    :return: None (show the bar plot)
+    '''
     global my_prediction
 
     my_prediction[name] = mae

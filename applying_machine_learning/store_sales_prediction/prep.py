@@ -7,6 +7,13 @@ from sklearn.preprocessing import OneHotEncoder, PolynomialFeatures
 
 
 def minmax_scale_y(feature_tr, feature_ts):
+    '''
+    Minmax scale y value
+
+    :param feature_tr: y value of train dataset
+    :param feature_ts: y value of test dataset
+    :return: scaled y value of train data, scaled y value of test data, scaler
+    '''
     scaler_y = MinMaxScaler(feature_range=(-1, 1))
     tr_y_scaled = scaler_y.fit_transform(feature_tr).reshape(-1, 1)
     ts_y_scaled = scaler_y.transform(feature_ts).reshape(-1, 1)
@@ -16,6 +23,13 @@ def minmax_scale_y(feature_tr, feature_ts):
     return tr_y_scaled, ts_y_scaled, scaler_y
 
 def minmax_scale_x(feature_tr, feature_ts):
+    '''
+    Minmax scale x variables
+
+    :param feature_tr: x variables of train dataset
+    :param feature_ts: x variables of test dataset
+    :return: scaled x variables of train data, scaled x variables of test data
+    '''
     scaler_x = MinMaxScaler(feature_range=(-1, 1))
     tr_x_scaled = scaler_x.fit_transform(np.array(feature_tr))
     ts_x_scaled = scaler_x.transform(np.array(feature_ts))
@@ -25,6 +39,16 @@ def minmax_scale_x(feature_tr, feature_ts):
     return tr_x_scaled, ts_x_scaled
 
 def create_dataset(data, look_back, look_after, y_feature, x_feature):
+    '''
+    Transform dataset to (# of data, periods, features)
+
+    :param data: dataset
+    :param look_back: periods in (# of data, periods, features) for X
+    :param look_after: periods in (# of data, periods, features) for Y
+    :param y_feature: List of y features
+    :param x_feature: List of x features
+    :return: X dataset, Y dataset
+    '''
     x_arr, y_arr = [], []
     for i in range(len(data) - (look_back + look_after) + 1):
         x_arr.append(data.loc[i:(i + look_back - 1), x_feature])
@@ -40,6 +64,13 @@ def create_dataset(data, look_back, look_after, y_feature, x_feature):
 
 class Preprocess_DARNN():
     def __init__(self, train_data, test_data, interval):
+        '''
+        Preprocess dataset for DARNN
+
+        :param train_data: train data
+        :param test_data: test data
+        :param interval: periods of x data
+        '''
         self.Y_train = train_data.iloc[:, 0]
         self.X_train = train_data.iloc[:, 1:]
         self.Y_test = test_data.iloc[:, 0]
